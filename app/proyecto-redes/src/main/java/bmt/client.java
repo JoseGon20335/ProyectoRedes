@@ -1,10 +1,10 @@
 // package app.proyecto-redes.src.main.java.bmt;
+import java.util.Scanner;
+import 
 
 public class client {
-    public static void signIn() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your username: ");
-        String username = scanner.next(); // Read a single word
-        System.out.println("Signing in with username: " + username);
+    public static void logIn() {
+        AbstractXMPPConnection connection = new XMPPTCPConnection("mtucker", "password", "jabber.org");
+        connection.connect().login();
     }
 }

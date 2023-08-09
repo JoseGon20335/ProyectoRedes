@@ -1,6 +1,8 @@
 package bmt;
 
 import java.util.Scanner;
+import org.jivesoftware.smack.XMPPTCPConnection;
+import org.jivesoftware.smack.XMPPTCPConnectionConfiguration;
 
 /**
  * Hello world!
@@ -10,6 +12,16 @@ public class App {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int choice;
+
+        XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+                .setHost("jabber.org")
+                .setPort(5222)
+
+                .setUsernameAndPassword("mtucker", "password")
+                .setServiceName("jabber.org")
+                .setHost("jabber.org")
+                .setPort(5222)
+                .build();
 
         do {
             System.out.println("Welcome to chat undifined name we are not creeative enough to think of a name");
