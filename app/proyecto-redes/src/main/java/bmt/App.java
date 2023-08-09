@@ -1,27 +1,30 @@
 package bmt;
 
+import java.io.IOException;
 import java.util.Scanner;
-import org.jivesoftware.smack.XMPPTCPConnection;
-import org.jivesoftware.smack.XMPPTCPConnectionConfiguration;
 
-/**
- * Hello world!
- *
- */
+import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jxmpp.stringprep.XmppStringprepException;
+
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SmackException, IOException, XMPPException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
         XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                .setHost("jabber.org")
+                .setHost("alumchat.xyz")
+                .setXmppDomain("alumchat.xyz")
                 .setPort(5222)
-
-                .setUsernameAndPassword("mtucker", "password")
-                .setServiceName("jabber.org")
-                .setHost("jabber.org")
-                .setPort(5222)
+                .setUsernameAndPassword("jose@alumchat.xyz", "123")
                 .build();
+
+        AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+        connection.connect(); // Establishes a connection to the server
+        connection.login(); // Logs in
 
         do {
             System.out.println("Welcome to chat undifined name we are not creeative enough to think of a name");
