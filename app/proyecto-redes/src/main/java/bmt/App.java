@@ -23,14 +23,6 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
-        // chatManager.addIncomingListener(new IncomingChatMessageListener() {
-        // @Override
-        // public void newIncomingMessage(EntityBareJid from, Message message, Chat
-        // chat) {
-        // System.out.println("New message from " + from + ": " + message.getBody());
-        // }
-        // });
-
         do {
             System.out.println("Welcome to chat undifined name we are not creeative enough to think of a name");
             System.out.println("1. Log in");
@@ -120,6 +112,14 @@ public class App {
 
         System.out.println("Welcome " + nameToRefer + " to the chat");
 
+        ChatManager chatManager = ChatManager.getInstanceFor(connection);
+        chatManager.addIncomingListener(new IncomingChatMessageListener() {
+            @Override
+            public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+                System.out.println("New message from " + from + ": " + message.getBody());
+            }
+        });
+
         do {
             System.out.println("Welcome to chat undifined name we are not creeative enough to think of a name");
             System.out.println("1. Chat with someone");
@@ -131,11 +131,7 @@ public class App {
             switch (choice) {
                 case 1:
 
-                    ChatManager chatManager = ChatManager.getInstanceFor(connection);
-                    EntityBareJid jid = JidCreate.entityBareFrom("baeldung2@alumchat.xyz");
-                    Chat chat = chatManager.chatWith(jid);
-
-                    chat.send("Hello!");
+                    messageSender(connection);
 
                 case 2:
                     System.out.println("Sing in...");
