@@ -17,33 +17,19 @@ import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 public class App {
+    static String nameToRefer = "";
+
     public static void main(String[] args) throws SmackException, IOException, XMPPException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
-        XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                .setHost("alumchat.xyz")
-                .setXmppDomain("alumchat.xyz")
-                .setPort(5222)
-                .setUsernameAndPassword("jose@alumchat.xyz", "123")
-                .build();
-
-        AbstractXMPPConnection connection = new XMPPTCPConnection(config);
-        connection.connect(); // Establishes a connection to the server
-        connection.login(); // Logs in
-
-        ChatManager chatManager = ChatManager.getInstanceFor(connection);
-        EntityBareJid jid = JidCreate.entityBareFrom("baeldung2@jabb3r.org");
-        Chat chat = chatManager.chatWith(jid);
-
-        chat.send("Hello!");
-
-        chatManager.addIncomingListener(new IncomingChatMessageListener() {
-            @Override
-            public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                System.out.println("New message from " + from + ": " + message.getBody());
-            }
-        });
+        // chatManager.addIncomingListener(new IncomingChatMessageListener() {
+        // @Override
+        // public void newIncomingMessage(EntityBareJid from, Message message, Chat
+        // chat) {
+        // System.out.println("New message from " + from + ": " + message.getBody());
+        // }
+        // });
 
         do {
             System.out.println("Welcome to chat undifined name we are not creeative enough to think of a name");
@@ -55,11 +41,19 @@ public class App {
 
             switch (choice) {
                 case 1:
-                    System.out.println("Log in.");
-                    break;
+                    System.out.println("Log in...");
+                    // XMPPTCPConnectionConfiguration config = logIn();
+
+                    // AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+                    // connection.connect(); // Establishes a connection to the server
+                    // connection.login(); // Logs in
                 case 2:
-                    System.out.println("Sing in.");
-                    break;
+                    System.out.println("Sing in...");
+                    XMPPTCPConnectionConfiguration config = signIn();
+
+                    AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+                    connection.connect(); // Establishes a connection to the server
+                    connection.login(); // Logs in
                 case 3:
                     System.out.println("Exiting the program.");
                     break;
@@ -71,19 +65,112 @@ public class App {
         scanner.close();
     }
 
-    public static void signIn() {
+    public static XMPPTCPConnectionConfiguration signIn()
+            throws SmackException, IOException, XMPPException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
+
         System.out.print("Enter your username: ");
-        String username = scanner.nextLine(); // Read a single word
-        username = username + "@gmail.xyz";
+        String username = scanner.nextLine();
+        username = username + "@alumchat.xyz";
+
+        System.out.print("Enter your password: ");
+        String password = scanner.nextLine();
+
+        nameToRefer = username;
+
+        XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+                .setHost("alumchat.xyz")
+                .setXmppDomain("alumchat.xyz")
+                .setPort(5222)
+                .setUsernameAndPassword(username, password)
+                .build();
+
         System.out.println("Signing in with username: " + username);
+
+        return config;
     }
 
-    public static void logIn() {
+    public static XMPPTCPConnectionConfiguration logIn()
+            throws SmackException, IOException, XMPPException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
+
         System.out.print("Enter your username: ");
-        String username = scanner.next(); // Read a single word
-        System.out.println("Logging in with username: " + username);
+        String username = scanner.nextLine();
+        username = username + "@alumchat.xyz";
+
+        System.out.print("Enter your password: ");
+        String password = scanner.nextLine();
+
+        XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+                .setHost("alumchat.xyz")
+                .setXmppDomain("alumchat.xyz")
+                .setPort(5222)
+                .setUsernameAndPassword(username, password)
+                .build();
+
+        System.out.println("Log in with username: " + username);
+
+        return config;
+    }
+
+    public static void insideChat(AbstractXMPPConnection connection)
+            throws SmackException, IOException, XMPPException, InterruptedException {
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        System.out.println("Welcome " + nameToRefer + " to the chat");
+
+        do {
+            System.out.println("Welcome to chat undifined name we are not creeative enough to think of a name");
+            System.out.println("1. Chat with someone");
+            System.out.println("2. Chat in a group chat");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+
+                    ChatManager chatManager = ChatManager.getInstanceFor(connection);
+                    EntityBareJid jid = JidCreate.entityBareFrom("baeldung2@alumchat.xyz");
+                    Chat chat = chatManager.chatWith(jid);
+
+                    chat.send("Hello!");
+
+                case 2:
+                    System.out.println("Sing in...");
+                    // XMPPTCPConnectionConfiguration config = signIn();
+
+                    // AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+                    // connection.connect(); // Establishes a connection to the server
+                    // connection.login(); // Logs in
+                case 3:
+                    System.out.println("Exiting the program.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please select a valid option.");
+            }
+        } while (choice != 3);
+
+        scanner.close();
+    }
+
+    public static void messageSender(AbstractXMPPConnection connection)
+            throws SmackException, IOException, XMPPException, InterruptedException {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the username of the destinatary: ");
+        String sendTo = scanner.nextLine();
+        sendTo = sendTo + "@alumchat.xyz";
+
+        System.out.print("Enter your message: ");
+        String message = scanner.nextLine();
+
+        ChatManager chatManager = ChatManager.getInstanceFor(connection);
+        EntityBareJid jid = JidCreate.entityBareFrom(sendTo);
+        Chat chat = chatManager.chatWith(jid);
+
+        chat.send(message);
     }
 
 }
