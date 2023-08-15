@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
@@ -34,18 +35,23 @@ public class App {
             switch (choice) {
                 case 1:
                     System.out.println("Log in...");
-                    // XMPPTCPConnectionConfiguration config = logIn();
+                    boolean config = logIn();
+                    if (config == false) {
+                        System.out.println("Error: Invalid username or password");
+                        break;
+                    } else {
+                        System.out.println("Connected");
+                        break;
+                    }
+                    // break;
+                case 2:
+                    System.out.println("Sing in...");
+                    // XMPPTCPConnectionConfiguration config = signIn();
 
                     // AbstractXMPPConnection connection = new XMPPTCPConnection(config);
                     // connection.connect(); // Establishes a connection to the server
                     // connection.login(); // Logs in
-                case 2:
-                    System.out.println("Sing in...");
-                    XMPPTCPConnectionConfiguration config = signIn();
-
-                    AbstractXMPPConnection connection = new XMPPTCPConnection(config);
-                    connection.connect(); // Establishes a connection to the server
-                    connection.login(); // Logs in
+                    break;
                 case 3:
                     System.out.println("Exiting the program.");
                     break;
@@ -82,27 +88,64 @@ public class App {
         return config;
     }
 
-    public static XMPPTCPConnectionConfiguration logIn()
+    public static boolean logIn()
             throws SmackException, IOException, XMPPException, InterruptedException {
-        Scanner scanner = new Scanner(System.in);
 
+        Scanner scanner = new Scanner(System.in);
+        boolean flag = false;
         System.out.print("Enter your username: ");
         String username = scanner.nextLine();
-        username = username + "@alumchat.xyz";
+        // username = username + "@alumchat.xyz";
 
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
-        XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                .setHost("alumchat.xyz")
-                .setXmppDomain("alumchat.xyz")
-                .setPort(5222)
-                .setUsernameAndPassword(username, password)
-                .build();
+        try {
+            XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+                    .setHost("alumchat.xyz")
+                    .setXmppDomain("alumchat.xyz")
+                    .setPort(5222)
+                    .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
+                    .setUsernameAndPassword(username, password)
+                    .build();
 
-        System.out.println("Log in with username: " + username);
+            System.out.println("Log in with username: " + username);
+            AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+            System.out.println("AQUIIIIIIII" + connection.getConnectionCounter());
+            System.out.println("Connected");
 
-        return config;
+            connection.connect(); // Establishes a connection to the server
+            connection.login(); // Logs in
+
+            insideChat(connection);
+            flag = true;
+            // if (connection.getConnectionCounter() <= 0) {
+            // System.out.println("Error: Invalid username or password");
+            // flag = false;
+            // } else {
+            // System.out.println("Connected");
+
+            // connection.connect(); // Establishes a connection to the server
+            // connection.login(); // Logs in
+
+            // insideChat(connection);
+            // flag = true;
+            // }
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+            flag = true;
+        }
+        // XMPPTCPConnectionConfiguration config =
+        // XMPPTCPConnectionConfiguration.builder()
+        // .setHost("alumchat.xyz")
+        // .setXmppDomain("alumchat.xyz")
+        // .setPort(5222)
+        // .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
+        // .setUsernameAndPassword(username, password)
+        // .build();
+
+        // System.out.println("Log in with username: " + username);
+        return flag;
     }
 
     public static void insideChat(AbstractXMPPConnection connection)
@@ -110,7 +153,7 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
-        System.out.println("Welcome " + nameToRefer + " to the chat");
+        System.out.println("Connected " + nameToRefer + " to the chat");
 
         ChatManager chatManager = ChatManager.getInstanceFor(connection);
         chatManager.addIncomingListener(new IncomingChatMessageListener() {
@@ -132,7 +175,7 @@ public class App {
                 case 1:
 
                     messageSender(connection);
-
+                    break;
                 case 2:
                     System.out.println("Sing in...");
                     // XMPPTCPConnectionConfiguration config = signIn();
@@ -140,6 +183,7 @@ public class App {
                     // AbstractXMPPConnection connection = new XMPPTCPConnection(config);
                     // connection.connect(); // Establishes a connection to the server
                     // connection.login(); // Logs in
+                    break;
                 case 3:
                     System.out.println("Exiting the program.");
                     break;
