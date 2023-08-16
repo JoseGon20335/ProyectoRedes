@@ -13,9 +13,12 @@ import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+import org.minidns.record.A;
+import org.jxmpp.jid.parts.Localpart;
 
 public class App {
     static String nameToRefer = "";
@@ -71,6 +74,8 @@ public class App {
         String username = scanner.nextLine();
         username = username + "@alumchat.xyz";
 
+        Localpart localpart = Localpart.from(username);
+
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
@@ -80,8 +85,13 @@ public class App {
                 .setHost("alumchat.xyz")
                 .setXmppDomain("alumchat.xyz")
                 .setPort(5222)
-                .setUsernameAndPassword(username, password)
                 .build();
+
+        AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+        connection.connect();
+
+        AccountManager accountManager = AccountManager.getInstance(connection);
+        accountManager.createAccount(localpart, password, null);
 
         System.out.println("Signing in with username: " + username);
 
@@ -111,8 +121,6 @@ public class App {
 
             System.out.println("Log in with username: " + username);
             AbstractXMPPConnection connection = new XMPPTCPConnection(config);
-            System.out.println("AQUIIIIIIII" + connection.getConnectionCounter());
-            System.out.println("Connected");
 
             connection.connect(); // Establishes a connection to the server
             connection.login(); // Logs in
