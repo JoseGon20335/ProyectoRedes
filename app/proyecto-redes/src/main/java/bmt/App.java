@@ -79,6 +79,7 @@ public class App {
                     break;
                 case 3:
                     System.out.println("Exiting the program.");
+                    System.exit(0);
                     break;
                 default:
                     System.out.println("Invalid choice. Please select a valid option.");
@@ -131,7 +132,7 @@ public class App {
         boolean flag = false;
         System.out.print("Enter your username: ");
         String username = scanner.nextLine();
-        username = username + "@alumchat.xyz";
+        // username = username + "@alumchat.xyz";
 
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
@@ -298,7 +299,7 @@ public class App {
         System.out.println("Ingrese el nombre del contacto para agregar");
         String username = scanner.nextLine();
         Roster roster = Roster.getInstanceFor(connection);
-        BareJid jid = JidCreate.bareFrom(username + "@alumchat.xyz");
+        BareJid jid = JidCreate.bareFrom(username);
 
         System.out.println("Ingrese su user");
         final String userNameForContact = scanner.nextLine();
