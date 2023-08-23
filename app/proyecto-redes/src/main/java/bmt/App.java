@@ -406,22 +406,22 @@ public class App {
         int optionInt = scanner.nextInt();
         switch (optionInt) {
             case 1:
-                Presence presence = presenceBuilder.setMode(Presence.Mode.available).build();
-                presence = stanzaFactory.buildPresenceStanza()
-                        .setPriority(10)
-                        .build();
-                connection.sendStanza(presence);
+                PresenceBuilder presenceBuilder2 = PresenceBuilder.buildPresence()
+                        .setMode(Presence.Mode.available)
+                        .setPriority(10);
+                connection.sendStanza(presenceBuilder2.build());
                 break;
             case 2:
-                presence = presenceBuilder.setMode(Presence.Mode.dnd).build();
-                presence = stanzaFactory.buildPresenceStanza()
-                        .setPriority(10)
-                        .build();
-                connection.sendStanza(presence);
+                presenceBuilder2 = PresenceBuilder.buildPresence()
+                        .setMode(Presence.Mode.dnd)
+                        .setPriority(10);
+                connection.sendStanza(presenceBuilder2.build());
                 break;
             case 3:
-                presence = presenceBuilder.setMode(Presence.Mode.away).build();
-                connection.sendStanza(presence);
+                presenceBuilder2 = PresenceBuilder.buildPresence()
+                        .setMode(Presence.Mode.away)
+                        .setPriority(10);
+                connection.sendStanza(presenceBuilder2.build());
                 break;
             default:
                 System.out.println("Option not valid");
