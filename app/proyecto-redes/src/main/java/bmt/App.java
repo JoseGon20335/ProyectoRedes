@@ -153,32 +153,11 @@ public class App {
 
             insideChat(connection);
             flag = true;
-            // if (connection.getConnectionCounter() <= 0) {
-            // System.out.println("Error: Invalid username or password");
-            // flag = false;
-            // } else {
-            // System.out.println("Connected");
 
-            // connection.connect(); // Establishes a connection to the server
-            // connection.login(); // Logs in
-
-            // insideChat(connection);
-            // flag = true;
-            // }
         } catch (Exception e) {
             System.out.println("Error: " + e);
             flag = true;
         }
-        // XMPPTCPConnectionConfiguration config =
-        // XMPPTCPConnectionConfiguration.builder()
-        // .setHost("alumchat.xyz")
-        // .setXmppDomain("alumchat.xyz")
-        // .setPort(5222)
-        // .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
-        // .setUsernameAndPassword(username, password)
-        // .build();
-
-        // System.out.println("Log in with username: " + username);
         return flag;
     }
 
@@ -189,14 +168,13 @@ public class App {
 
         System.out.println("Connected " + nameToRefer + " to the chat");
 
-        // ChatManager chatManager = ChatManager.getInstanceFor(connection);
-        // chatManager.addIncomingListener(new IncomingChatMessageListener() {
-        // @Override
-        // public void newIncomingMessage(EntityBareJid from, Message message, Chat
-        // chat) {
-        // System.out.println("New message from " + from + ": " + message.getBody());
-        // }
-        // });
+        ChatManager chatManager = ChatManager.getInstanceFor(connection);
+        chatManager.addIncomingListener(new IncomingChatMessageListener() {
+            @Override
+            public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+                System.out.println("New message from " + from + ": " + message.getBody());
+            }
+        });
 
         do {
             System.out.println("Welcome to chat undifined name we are not creeative enough to think of a name");
@@ -274,18 +252,41 @@ public class App {
             throws SmackException, IOException, XMPPException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter the username of the destinatary: ");
+        System.out.print("Ingrese el nombre del caht grupal: ");
         String sendTo = scanner.nextLine();
-        sendTo = sendTo + "@alumchat.xyz";
 
-        System.out.print("Enter your message: ");
+        System.out.print("Ingrese su nombre: ");
         String message = scanner.nextLine();
 
-        ChatManager chatManager = ChatManager.getInstanceFor(connection);
-        EntityBareJid jid = JidCreate.entityBareFrom(sendTo);
-        Chat chat = chatManager.chatWith(jid);
+        EntityBareJid entity = JidCreate.entityBareFrom(sendTo + "@conference.alumchat.xyz");
+        Resourcepart chatName = Resourcepart.from(message);
 
-        chat.send(message);
+        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+        MultiUserChat muc = manager.getMultiUserChat(entity);
+
+        MucEnterConfiguration.Builder builder = muc.getEnterConfigurationBuilder(chatName).requestNoHistory();
+        MucEnterConfiguration configuration = builder.build();
+
+        muc.join(configuration);
+
+        muc.addMessageListener(new MessageListener() {
+            @Override
+            public void processMessage(Message message) {
+                if (message.getBody() != null) {
+                    System.out.println(message.getFrom() + ": " + message.getBody());
+                }
+            }
+        });
+        do {
+            System.out.println("Opciones de chat grupal");
+            System.out.println("1. Ver chat");
+            System.out.println("2. Salir del grupo");
+
+            System.out.println("Escriba su mensaje");
+            message = scanner.nextLine();
+
+            muc.sendMessage(message);
+        } while (message != "exit");
     }
 
     public static void addContact(AbstractXMPPConnection connection)
@@ -443,7 +444,7 @@ public class App {
     }
 
     public static void deleteAccount(AbstractXMPPConnection connection)
-            throws NotConnectedException, InterruptedException {
+            throws NotConnectedException, InterruptedException, NoResponseException, XMPPErrorException {
         AccountManager accountManager = AccountManager.getInstance(connection);
         accountManager.deleteAccount();
     }

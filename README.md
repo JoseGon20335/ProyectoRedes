@@ -20,4 +20,4 @@ Comunicación
 - [ ] Participar en conversaciones grupales
 - [x] Definir mensaje de presencia
 - [ ] Enviar/recibir notificaciones
-- [ ] Enviar/recibir archivo- s
+- [ ] Enviar/recibir archivos
