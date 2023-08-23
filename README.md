@@ -17,7 +17,7 @@ Comunicación
 - [x] Agregar un usuario a los contactos
 - [x] Mostrar detalles de contacto de un usuario
 - [x] Comunicación 1 a 1 con cualquier usuario/contacto
-- [ ] Participar en conversaciones grupales
+- [x] Participar en conversaciones grupales
 - [x] Definir mensaje de presencia
 - [ ] Enviar/recibir notificaciones
 - [ ] Enviar/recibir archivos
