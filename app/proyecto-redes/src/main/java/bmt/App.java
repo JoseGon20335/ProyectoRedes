@@ -85,8 +85,6 @@ public class App {
                     System.out.println("Invalid choice. Please select a valid option.");
             }
         } while (choice != 3);
-
-        scanner.close();
     }
 
     public static XMPPTCPConnectionConfiguration signIn()
@@ -228,9 +226,7 @@ public class App {
                 default:
                     System.out.println("Invalid choice. Please select a valid option.");
             }
-        } while (choice != 3);
-
-        scanner.close();
+        } while (choice != 7);
     }
 
     public static void messageSender(AbstractXMPPConnection connection)
@@ -255,7 +251,7 @@ public class App {
             throws SmackException, IOException, XMPPException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Ingrese el nombre del caht grupal: ");
+        System.out.print("Ingrese el nombre del chat grupal: ");
         String sendTo = scanner.nextLine();
 
         System.out.print("Ingrese su nombre: ");
@@ -280,16 +276,20 @@ public class App {
                 }
             }
         });
+        int choice;
         do {
             System.out.println("Opciones de chat grupal");
-            System.out.println("1. Ver chat");
+            System.out.println("1. Chatear en el grupo");
             System.out.println("2. Salir del grupo");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            if (choice == 1) {
+                System.out.println("Escriba su mensaje");
+                message = scanner.nextLine();
 
-            System.out.println("Escriba su mensaje");
-            message = scanner.nextLine();
-
-            muc.sendMessage(message);
-        } while (message != "exit");
+                muc.sendMessage(message);
+            }
+        } while (choice != 2);
     }
 
     public static void addContact(AbstractXMPPConnection connection)
@@ -308,6 +308,24 @@ public class App {
 
         finalRoster.addRosterListener(new RosterListener() {
             @Override
+            public void entriesAdded(Collection<Jid> addresses) {
+                // Handle new entries
+                System.out.println("Contacto agregado");
+            }
+
+            @Override
+            public void entriesUpdated(Collection<Jid> addresses) {
+                // Handle updated entries
+                System.out.println("Contacto actualizado");
+            }
+
+            @Override
+            public void entriesDeleted(Collection<Jid> addresses) {
+                // Handle deleted entries
+                System.out.println("Contacto eliminado");
+            }
+
+            @Override
             public void presenceChanged(Presence presence) {
                 if (presence.getType() == Presence.Type.subscribe) {
                     BareJid fromJID = presence.getFrom().asBareJid();
@@ -319,24 +337,6 @@ public class App {
                         e.printStackTrace();
                     }
                 }
-            }
-
-            @Override
-            public void entriesAdded(Collection<Jid> addresses) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'entriesAdded'");
-            }
-
-            @Override
-            public void entriesUpdated(Collection<Jid> addresses) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'entriesUpdated'");
-            }
-
-            @Override
-            public void entriesDeleted(Collection<Jid> addresses) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'entriesDeleted'");
             }
         });
 
@@ -355,21 +355,25 @@ public class App {
                 @Override
                 public void entriesAdded(java.util.Collection<Jid> addresses) {
                     // Handle new entries
+                    System.out.println("Contacto agregado");
                 }
 
                 @Override
                 public void entriesUpdated(java.util.Collection<Jid> addresses) {
                     // Handle updated entries
+                    System.out.println("Contacto actualizado");
                 }
 
                 @Override
                 public void entriesDeleted(java.util.Collection<Jid> addresses) {
                     // Handle deleted entries
+                    System.out.println("Contacto eliminado");
                 }
 
                 @Override
                 public void presenceChanged(Presence presence) {
                     // Handle presence changes
+                    System.out.println("Cambio de presencia");
                 }
             });
 
@@ -382,8 +386,6 @@ public class App {
                 System.out.println("Is avaidable: " + presence.getMode());
 
             }
-
-            connection.disconnect();
         } catch (SmackException | InterruptedException e) {
             e.printStackTrace();
         }
