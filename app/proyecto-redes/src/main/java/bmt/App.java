@@ -75,11 +75,7 @@ public class App {
                     // break;
                 case 2:
                     System.out.println("Sing in...");
-                    // XMPPTCPConnectionConfiguration config = signIn();
-
-                    // AbstractXMPPConnection connection = new XMPPTCPConnection(config);
-                    // connection.connect(); // Establishes a connection to the server
-                    // connection.login(); // Logs in
+                    signIn();
                     break;
                 case 3:
                     System.out.println("Exiting the program.");
@@ -98,7 +94,7 @@ public class App {
 
         System.out.print("Enter your username: ");
         String username = scanner.nextLine();
-        username = username + "@alumchat.xyz";
+        // username = username + "@alumchat.xyz";
 
         Localpart localpart = Localpart.from(username);
 
@@ -110,6 +106,7 @@ public class App {
         XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
                 .setHost("alumchat.xyz")
                 .setXmppDomain("alumchat.xyz")
+                .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
                 .setPort(5222)
                 .build();
 
@@ -117,9 +114,12 @@ public class App {
         connection.connect();
 
         AccountManager accountManager = AccountManager.getInstance(connection);
-        accountManager.createAccount(localpart, password, null);
+        accountManager.sensitiveOperationOverInsecureConnection(true);
+        accountManager.createAccount(Localpart.fromOrThrowUnchecked(username), password);
 
         System.out.println("Signing in with username: " + username);
+
+        insideChat(connection);
 
         return config;
     }
@@ -217,10 +217,12 @@ public class App {
                 case 7:
                     System.out.println("Closing session.");
                     closeSession(connection);
+                    main(null);
                     break;
                 case 8:
                     System.out.println("Delete account.");
-
+                    deleteAccount(connection);
+                    main(null);
                     break;
                 default:
                     System.out.println("Invalid choice. Please select a valid option.");
