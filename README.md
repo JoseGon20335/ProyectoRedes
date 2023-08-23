@@ -8,7 +8,7 @@ La mensajería instantánea es una de las invenciones que han revolucionado la c
 - Comprender las bases de programación asíncrona requeridas para algunas de las necesidades de desarrollo en redes.
 
 Administración de cuentas
-[x] Registrar una nueva cuenta en el servidor
+[ x ] Registrar una nueva cuenta en el servidor
 [X] Iniciar sesión con una cuenta
 [x] Cerrar sesión con una cuenta
 [] Eliminar la cuenta del servidor
