@@ -28,6 +28,8 @@ import org.minidns.record.A;
 import org.jxmpp.jid.parts.Localpart;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.PresenceBuilder;
+import org.jivesoftware.smack.packet.StanzaFactory;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
@@ -202,9 +204,10 @@ public class App {
             System.out.println("2. Chat in a group chat");
             System.out.println("3. Mostrar todos los usuarios");
             System.out.println("4. Agregar un usuario a los contactos");
-            System.out.println("5. Detalles de un usuario");
+            System.out.println("5. Cambiar presencia");
             System.out.println("6. Cambiar estado");
             System.out.println("7. Cerrar sesion");
+            System.out.println("8. Delete Account");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
 
@@ -219,19 +222,27 @@ public class App {
                     break;
                 case 3:
                     System.out.println("Mostar contactos");
+                    seeContactInfo(connection);
                     break;
                 case 4:
                     System.out.println("Agregar un usuario a los contactos");
                     addContact(connection);
                     break;
                 case 5:
-                    System.out.println("Detalles de un usuario");
+                    System.out.println("Cambiar presencia");
+                    changePresence(connection);
                     break;
                 case 6:
                     System.out.println("Cambiar estado");
+                    changeStatus(connection);
                     break;
                 case 7:
-                    System.out.println("Exiting the program.");
+                    System.out.println("Closing session.");
+                    closeSession(connection);
+                    break;
+                case 8:
+                    System.out.println("Delete account.");
+
                     break;
                 default:
                     System.out.println("Invalid choice. Please select a valid option.");
@@ -280,14 +291,14 @@ public class App {
     public static void addContact(AbstractXMPPConnection connection)
             throws NotLoggedInException, NoResponseException, XMPPErrorException,
             NotConnectedException, InterruptedException, XmppStringprepException {
-        Scanner sc = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese el nombre del contacto para agregar");
-        String targetJID = sc.nextLine();
+        String username = scanner.nextLine();
         Roster roster = Roster.getInstanceFor(connection);
-        BareJid jid = JidCreate.bareFrom(targetJID + "@alumchat.xyz");
+        BareJid jid = JidCreate.bareFrom(username + "@alumchat.xyz");
 
         System.out.println("Ingrese su user");
-        final String userNameForContact = sc.nextLine();
+        final String userNameForContact = scanner.nextLine();
 
         final Roster finalRoster = roster; // Declare a final reference to the roster
 
@@ -326,7 +337,114 @@ public class App {
         });
 
         // Send subscription request
-        finalRoster.createItemAndRequestSubscription(jid, targetJID, null);
+        finalRoster.createItemAndRequestSubscription(jid, username, null);
     }
 
+    // ver a los contactos
+    public static void seeContactInfo(AbstractXMPPConnection connection)
+            throws SmackException, IOException, XMPPException, InterruptedException {
+
+        try {
+
+            Roster roster = Roster.getInstanceFor(connection);
+            roster.addRosterListener(new RosterListener() {
+                @Override
+                public void entriesAdded(java.util.Collection<Jid> addresses) {
+                    // Handle new entries
+                }
+
+                @Override
+                public void entriesUpdated(java.util.Collection<Jid> addresses) {
+                    // Handle updated entries
+                }
+
+                @Override
+                public void entriesDeleted(java.util.Collection<Jid> addresses) {
+                    // Handle deleted entries
+                }
+
+                @Override
+                public void presenceChanged(Presence presence) {
+                    // Handle presence changes
+                }
+            });
+
+            roster.reload();
+            for (RosterEntry entry : roster.getEntries()) {
+                System.out.println("______________________________________________________");
+                System.out.println("User name: " + entry.getJid());
+                Presence presence = roster.getPresence(entry.getJid());
+                System.out.println("Is present: " + presence.getStatus());
+                System.out.println("Is avaidable: " + presence.getMode());
+
+            }
+
+            connection.disconnect();
+        } catch (SmackException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // define mensaajes de presencia y status
+    public static void changePresence(AbstractXMPPConnection connection)
+            throws NotConnectedException, InterruptedException {
+        StanzaFactory stanzaFactory = connection.getStanzaFactory();
+        PresenceBuilder presenceBuilder = stanzaFactory.buildPresenceStanza();
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Elija un estado");
+        System.out.println("1.Available");
+        System.out.println("2.Not Available");
+        System.out.println("3.Away");
+        int optionInt = scanner.nextInt();
+        switch (optionInt) {
+            case 1:
+                Presence presence = presenceBuilder.setMode(Presence.Mode.available).build();
+                presence = stanzaFactory.buildPresenceStanza()
+                        .setPriority(10)
+                        .build();
+                connection.sendStanza(presence);
+                break;
+            case 2:
+                presence = presenceBuilder.setMode(Presence.Mode.dnd).build();
+                presence = stanzaFactory.buildPresenceStanza()
+                        .setPriority(10)
+                        .build();
+                connection.sendStanza(presence);
+                break;
+            case 3:
+                presence = presenceBuilder.setMode(Presence.Mode.away).build();
+                connection.sendStanza(presence);
+                break;
+            default:
+                System.out.println("Option not valid");
+        }
+    }
+
+    // define mensaajes de presencia y status
+    public static void changeStatus(AbstractXMPPConnection connection)
+            throws NotConnectedException, InterruptedException {
+        StanzaFactory stanzaFactory = connection.getStanzaFactory();
+        PresenceBuilder presenceBuilder = stanzaFactory.buildPresenceStanza();
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese el nuevo estado para su usuario");
+        String newStatus = scanner.nextLine();
+        Presence statusPresence = presenceBuilder.setStatus(newStatus).build();
+        connection.sendStanza(statusPresence);
+        scanner.nextLine();
+    }
+
+    public static void closeSession(AbstractXMPPConnection connection)
+            throws NotConnectedException, InterruptedException {
+        connection.disconnect();
+    }
+
+    public static void deleteAccount(AbstractXMPPConnection connection)
+            throws NotConnectedException, InterruptedException {
+        AccountManager accountManager = AccountManager.getInstance(connection);
+        accountManager.deleteAccount();
+    }
 }
